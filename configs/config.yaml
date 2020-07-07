@@ -1,0 +1,26 @@
+---
+# Several editors have issues with event watching, signalling multiple events
+# Gedit works properly, so for editing the config file, please use the aforementioned until
+# I figure out a way to properly handle other editors.
+hosts:
+-       address: "192.168.0.25"
+        pinginterval : "-i 2"
+        recipients:
+        - ph1a@placeholder.com
+        
+-       address: "104.22.10.161"
+        pinginterval : "-i 2"
+        recipients:
+        - placeholder2a@placeholder.com
+        - placeholder2b@placeholder.com
+
+-       address: "192.168.0.30"
+        pinginterval : "-i 2"
+        recipients:
+        - ph3a@ph.com
+        - ph3b@ph.com
+        - ph3c@ph.com
+
+
+...
+
