@@ -40,11 +40,14 @@ func main() {
 	signal.Notify(sigs, syscall.SIGUSR1)
 
 	// Goroutines/concurrent workers..
-	go mail.Sender(&mailconf, mailInfoChannel)
 	go ping.ContinuousLooper(v, mailInfoChannel, hostChannel, &conf, hostToPingChannel)
+	// ThreadWorker blocks until Looper sends host over hostToPingChannel
+	go ping.ThreadWorker(mailInfoChannel, hostToPingChannel)
+	// Sender blocks until it receives host over mailInfoChannel
+	go mail.Sender(&mailconf, mailInfoChannel)
+	// Handler blocks until it receives a signal over sigs channel
 	go signalization.Handler(v, mailInfoChannel, hostChannel, sigs, &conf, hostToPingChannel)
 	go configuration.ConfigWatcher(v, hostChannel, &conf)
-	go ping.ThreadWorker(mailInfoChannel, hostToPingChannel)
 
 	<-stop
 }

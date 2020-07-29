@@ -12,24 +12,20 @@ import (
 // Handler does one loop through the hosts when woken up by a signal
 func Handler(v *viper.Viper, mailInfoChannel chan<- mail.HostInfo, hostChannel <-chan []ping.Host, sigs <-chan os.Signal, configurationPtr *ping.Config, hostToPingChannel chan<- ping.Host) {
 	for {
+		siggy := <-sigs
+		fmt.Printf("You have force activated pinging with %s \n", siggy)
 		select {
-		case siggy := <-sigs:
-			fmt.Printf("You have force activated pinging with %s \n", siggy)
-			select {
-			// Config change occurred, reloaded hosts
-			case hostChannelSlice := <-hostChannel:
-				for _, hostIteration := range hostChannelSlice {
-					hostToPingChannel <- hostIteration
-				}
-				// Default behavior, no config change, check host perpetually
-
-			default:
-				for _, hostIteration := range configurationPtr.Hosts {
-					hostToPingChannel <- hostIteration
-				}
+		// Config change occurred, reloaded hosts
+		case hostChannelSlice := <-hostChannel:
+			for _, hostIteration := range hostChannelSlice {
+				hostToPingChannel <- hostIteration
 			}
+			// Default behavior, no config change, check host perpetually
+
 		default:
-			// Nothing, empty looping
+			for _, hostIteration := range configurationPtr.Hosts {
+				hostToPingChannel <- hostIteration
+			}
 		}
 	}
 }
