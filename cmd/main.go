@@ -30,7 +30,7 @@ func main() {
 
 	// Initialization of channels
 	// This channel is used for relaying info to the mailing thread.
-	mailInfoChannel := make(chan mail.MailHostInfo)
+	mailInfoChannel := make(chan mail.HostInfo)
 
 	hostChannel := make(chan []ping.Host)
 	hostToPingChannel := make(chan ping.Host)
@@ -39,8 +39,8 @@ func main() {
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGUSR1)
 
-	// Goroutines
-	go mail.MailThread(&mailconf, mailInfoChannel)
+	// Goroutines/concurrent workers..
+	go mail.Sender(&mailconf, mailInfoChannel)
 	go ping.ContinuousLooper(v, mailInfoChannel, hostChannel, &conf, hostToPingChannel)
 	go signalization.Handler(v, mailInfoChannel, hostChannel, sigs, &conf, hostToPingChannel)
 	go configuration.ConfigWatcher(v, hostChannel, &conf)

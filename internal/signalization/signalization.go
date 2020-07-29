@@ -10,7 +10,7 @@ import (
 )
 
 // Handler does one loop through the hosts when woken up by a signal
-func Handler(v *viper.Viper, mailInfoChannel chan<- mail.MailHostInfo, hostChannel <-chan []ping.Host, sigs <-chan os.Signal, configurationPtr *ping.Config, hostToPingChannel chan<- ping.Host) {
+func Handler(v *viper.Viper, mailInfoChannel chan<- mail.HostInfo, hostChannel <-chan []ping.Host, sigs <-chan os.Signal, configurationPtr *ping.Config, hostToPingChannel chan<- ping.Host) {
 	for {
 		select {
 		case siggy := <-sigs:

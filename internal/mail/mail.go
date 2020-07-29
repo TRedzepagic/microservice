@@ -9,27 +9,29 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-type MailConfig struct {
+// Config data contract
+type Config struct {
 	Host string `yaml:"host"`
 	Port int    `yaml:"port"`
 	User string `yaml:"user"`
 	Pass string `yaml:"pass"`
 }
 
-type MailHostInfo struct {
+// HostInfo data contract
+type HostInfo struct {
 	HostIterationAddress      string
 	HostIterationPingInterval string
 	Recipients                []string
 }
 
 // GetMail gets personal configuration from another file
-func GetMail(path string) MailConfig {
+func GetMail(path string) Config {
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
 		fmt.Println("error opening configuration", err.Error())
 	}
 
-	var mailconfiguration MailConfig
+	var mailconfiguration Config
 	err = yaml.Unmarshal(data, &mailconfiguration)
 
 	if err != nil {
@@ -38,8 +40,8 @@ func GetMail(path string) MailConfig {
 	return mailconfiguration
 }
 
-// MailThread to downed hosts, starts in a thread and waits for downed hosts
-func MailThread(mailconf *MailConfig, mailHostInfoChannel <-chan MailHostInfo) {
+// Sender to downed hosts, starts in a thread and waits for downed hosts
+func Sender(mailconf *Config, mailHostInfoChannel <-chan HostInfo) {
 	config := mailer.Config{
 		Host: mailconf.Host,
 		Port: mailconf.Port,
@@ -55,7 +57,7 @@ func MailThread(mailconf *MailConfig, mailHostInfoChannel <-chan MailHostInfo) {
 	fmt.Println("Pass: Hidden")
 
 	for {
-
+		// Blocks until downed host arrives
 		hostStructFromChan := <-mailHostInfoChannel
 		mail := mailer.NewMail()
 		mail.FromName = "Go Mailer - Redzep Microservice"

@@ -23,7 +23,7 @@ type Config struct {
 }
 
 // ThreadWorker pings hosts
-func ThreadWorker(mailHostInfoChannel chan<- mail.MailHostInfo, hostToPingChannel <-chan Host) {
+func ThreadWorker(mailHostInfoChannel chan<- mail.HostInfo, hostToPingChannel <-chan Host) {
 	for {
 		hostIteration := <-hostToPingChannel
 		// Ping syscall, -c is ping count, -i is interval, -w is timeout
@@ -33,7 +33,7 @@ func ThreadWorker(mailHostInfoChannel chan<- mail.MailHostInfo, hostToPingChanne
 			fmt.Println("HOST " + hostIteration.Address + " IS DOWN, SENDING MAIL..")
 
 			// instantiate a structure representing host info, shorthand
-			mailHostInfoStruct := mail.MailHostInfo{
+			mailHostInfoStruct := mail.HostInfo{
 				Recipients:                hostIteration.Recipients,
 				HostIterationAddress:      hostIteration.Address,
 				HostIterationPingInterval: hostIteration.Pinginterval}
@@ -46,7 +46,7 @@ func ThreadWorker(mailHostInfoChannel chan<- mail.MailHostInfo, hostToPingChanne
 }
 
 // ContinuousLooper loops continuously, sends tasks (hosts) to ping workers
-func ContinuousLooper(v *viper.Viper, mailInfoChannel chan<- mail.MailHostInfo, hostChannel <-chan []Host, configurationPtr *Config, hostToPingChannel chan<- Host) {
+func ContinuousLooper(v *viper.Viper, mailInfoChannel chan<- mail.HostInfo, hostChannel <-chan []Host, configurationPtr *Config, hostToPingChannel chan<- Host) {
 	clk := 5 * time.Second
 	ticker := time.NewTicker(clk)
 	fmt.Printf("Pinging of hosts will occur every %f seconds. \n", clk.Seconds())
